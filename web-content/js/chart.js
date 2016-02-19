@@ -1,3 +1,11 @@
+function ready(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
 function stream_layers(n, m, o) {
   if (arguments.length < 3) o = 0;
   function bump(a) {
@@ -21,35 +29,37 @@ function stream_index(d, i) {
   return {x: i, y: Math.max(0, d)};
 }
 
-nv.addGraph(function() {
-  var chart = nv.models.lineWithFocusChart();
+function addGraph() {
+  nv.addGraph(function() {
+    var chart = nv.models.lineWithFocusChart();
 
-  chart.xAxis
-      .tickFormat(d3.format(',f'));
+    chart.xAxis
+        .tickFormat(d3.format(',f'));
 
-  chart.yAxis
-      .tickFormat(d3.format(',.2f'));
+    chart.yAxis
+        .tickFormat(d3.format(',.2f'));
 
-  chart.y2Axis
-      .tickFormat(d3.format(',.2f'));
+    chart.y2Axis
+        .tickFormat(d3.format(',.2f'));
 
-  d3.select('#chart svg')
-      .datum(testData())
-      .transition().duration(500)
-      .call(chart);
+    d3.select('#chart svg')
+        .datum(testData())
+        .transition().duration(500)
+        .call(chart);
 
-  nv.utils.windowResize(chart.update);
+    nv.utils.windowResize(chart.update);
 
-  chart.lines.dispatch.on('elementClick', function(e) {
-    fin.desktop.InterApplicationBus.publish("chart-click", {
-        key: e.series.key,
-        x: e.point.x,
-        y: Math.floor(e.point.y)
-    });
-   });
+    chart.lines.dispatch.on('elementClick', function(e) {
+      fin.desktop.InterApplicationBus.publish("chart-click", {
+          key: e.series.key,
+          x: e.point.x,
+          y: Math.floor(e.point.y)
+      });
+     });
 
-  return chart;
-});
+    return chart;
+  });
+}
 /**************************************
  * Simple test data generator
  */
@@ -62,3 +72,5 @@ function testData() {
     };
   });
 }
+
+ready(addGraph);
